@@ -1,0 +1,36 @@
+
+Maintainers and developers for networking code sections
+
+Code Section		Bug Report Contact
+-------------------+-------------------------------------------
+802 [other	]	alan@cymru.net	
+    [token ring	]	needs a maintainer/debugger
+appletalk		alan@cymru.net and netatalk@umich.edu
+ax25			jsn@cs.nott.ac.uk
+core			alan@cymru.net
+ethernet		alan@cymru.net
+ipv4			alan@cymru.net
+ipx			alan@cymru.net,greg@caldera.com
+netrom			jsn@cs.nott.ac.uk
+unix			alan@cymru.net
+
+
+	If in doubt contact me <alan@cymru.net> first.
+
+---------------------------------------------------------------------------
+
+For commercial UK custom Linux networking projects, drivers and development
+(but not free support!) I can be contacted via
+
+	I^2IT Ltd, The Innovation Centre, University Of Wales
+		Swansea SA2 8PP.  
+	Fax: +44 1792 295811
+	Tel: +44 1792 295213
+
+	Email: alan@cymru.net
+
+Please don't send commercial queries to my .ac.uk email address as I have that
+in an academic and _not_ commercial capacity. On the other hand feel
+free to send bug reports, queries and enhancements that way.
+
+Alan

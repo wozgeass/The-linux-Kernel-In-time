@@ -1,0 +1,453 @@
+This document contains a list of the latest releases of the most
+important packages for Linux as well as instructions for newcomers to
+the 1.3.x series of kernels.
+
+Last updated: Apr 29, 1996.
+Author: Chris Ricker (gt1355b@prism.gatech.edu), based on the original by
+Alessandro Sigala (ssigala@globalnet.it).
+
+Current Releases
+****************
+
+- Kernel modules	 Stable: 1.3.57, Exp: 1.3.69f
+- PPP daemon		 Stable: 2.2.0f
+- Dynamic linker (ld.so) 1.7.14
+- GNU CC		 2.7.2
+- Binutils		 2.6.0.12
+- Linux C Library	 Stable:  5.2.18, Beta:  5.3.12
+- Linux C++ Library	 2.7.1.4
+- Termcap		 2.0.8
+- Procps		 0.99a
+- Gpm			 1.06
+- SysVinit		 2.60
+- Util-linux		 2.5
+
+What you really need to upgrade
+*******************************
+
+Dynamic linker
+==============
+
+   You might upgrade the dynamic linker to the latest release, but only
+to solve some bugs.
+
+SysVinit
+========
+
+   The FIFO behavior is changed in the latest 1.3.x kernel releases.
+Upgrade to 2.60 if the older version seems broken.
+
+PPP daemon and utilities
+========================
+
+   To use the PPP protocol with the 1.3.x linux kernel, you need to
+upgrade the PPP package to version 2.2.0f.
+
+Procps utilities
+================
+
+   In the latest 1.3.x kernel releases the /proc filesystem structure
+was changed, so you need to upgrade the Procps package to version
+0.99a.  In the very latest kernels, /proc has changed again.  There's
+not yet an officially updated version of procps, so make due with
+0.99a; you might want to look for one of the patches floating around to
+update 0.99a for use with 1.3.94 and later kernels.
+
+Installation notes
+******************
+
+Kernel Modules
+==============
+
+   The current kernel modules release is 1.3.57, but you need the
+experimental release 1.3.69 to use newer binutils 2.6.0.x, because
+modules compiled with new binutils can't be loaded by modules 1.3.57.
+
+The Linux C Library
+===================
+
+   The latest stable Linux C Library release is 5.2.18.  If you upgrade
+to this from 5.0.9 or earlier, be sure to read the `release.libc-5.2.18'
+file, since GNU make and a few other fairly important utils can be
+broken by the upgrade.
+
+   The current (beta) Linux C Library release is 5.3.12. In this
+release there are some important changes that may cause troubles to
+buggy programs (programs that call free() on a pointer not returned by
+malloc() work with previous libc, but not with this release) then read
+the `release.libc-5.3.9' file carefully!  In the latest libc releases a
+dirent bug, which erroneously defined d->reclen to d->namlen if USE_GNU
+was defined, has been fixed.  Unfortunately, some GNU packages depend on
+this bug.  GNU make 3.xx is one of them.  To fix that you need to patch
+and recompile those programs (a patch for make is included in the file
+`release.libc-.5.3.9', and the address to obtain a precompiled binary
+is at the end of this file).
+
+   Also, the libc-5.3.x line has a known security hole relating to
+rlogin.  Libc-5.3.12 fixes this, so if you're going to run an
+experimental libc, be sure to upgrade to 5.3.12.
+
+   If you're getting an error message that is something to the effect of
+
+   `fcntl_setlk() called by process 123 with broken flock() emulation'
+
+   then you need to upgrade to libc-5.2.18 as well.  A proper (in other
+words, BSD-style ;-) flock system call was added in 1.3.x, and older
+libc's will now give this error.  It doesn't *really* matter, so you
+can just ignore it.  If it really annoys you, upgrade libc (and
+recompile any static binaries you might have that are linked against
+the old libc).  If you're feeling lazy, just comment out
+
+   `                printk(KERN_WARNING
+"fcntl_setlk() called by process %d with broken flock()
+  emulation\n",                        current->pid);'
+
+   in linux/fs/locks.c and recompile.
+
+The Termcap Library
+===================
+
+   The current Termcap release is 2.0.8. If you upgrade to this release
+read the `README' file contained into the package to get some important
+information about the `tgetent' function changes!
+
+Upgrading to 1.3.x kernel from 1.2.13
+*************************************
+
+   This section was based on material from the linux-kernel mailing
+list, Jared Mauch's web page "Software Victims of the 1.3 Kernel
+Development" (http://www2.nether.net/~jared/victim.html), and Axel
+Boldt's (boldt@math.ucsb.edu) Configure.help file, among other sources.
+
+   This section is intended primarily to help those that are new to the
+1.3.x series of Linux kernels.  In the ongoing effort to make a faster,
+better kernel and eventually achieve total world domination, several
+features of the Linux kernel have been improved.  As a result, when you
+first upgrade to 1.3.x from 1.2.13, you will also have to upgrade
+several utilities that are closely associated with the kernel and make
+use of these features.
+
+Proc filesystem
+===============
+
+   Various changes in the /proc filesystem have been made, affecting
+ps, top, etc.  Running `top' or `ps -auwwx' will now give you a floating
+point exception. To fix the problem, upgrade to procps-0.99a.tar.gz,
+available at
+ftp://tsx-11.mit.edu/pub/linux/BETA/procps/procps-0.99a.tar.gz.
+
+Modules
+=======
+
+   1.3.x is almost completely modularized, and kerneld is now
+incorporated into the kernel.  To take advantage of this, you'll need
+the latest version of the module support apps.  The latest non-beta is
+modules-1.3.57.tar.gz, and the latest beta is modules-1.3.69f.tar.gz.
+These should be available at the same place you picked up your kernel
+(ftp://ftp.cc.gatech.edu/pub/linux/kernel/) and the home page is
+http://www.pi.se/blox/modules/index.html.  Note:  If you try to load a
+module and get a message like
+
+   `gcc2_compiled, undefined Failed to load module!  The symbols from
+kernel 1.3.foo don't match 1.3.foo'
+
+   where `foo' is a number between 1 and 89, then it's time to upgrade
+module utilities from 1.3.57 to 1.3.69f; you'll only get this error if
+you're running the latest binutils, so most people don't need to
+upgrade.
+
+   Another little tip:  you can't have both a.out *and* ELF support
+compiled as modules.  Otherwise, you get a nice Catch-22 when you try
+to run insmod to install a.out/ELF support so you can run insmod ;-).
+If you have an all-ELF system, but need a.out for the occasional
+Netscape session, then you can do a.out support as a module.
+Otherwise, you should probably leave it in the kernel, and if you
+haven't gone ELF yet, you can probably say no to ELF support.
+Similarly, any partitions that you have to mount at startup have to
+have their necessary file system and device drivers compiled into the
+kernel, so don't get grandiose ideas about going completely modular and
+then forget to compile ext2fs support and ide drive support into your
+kernel ;-).
+
+PPP driver
+==========
+
+   You need to be running a pppd from ppp-2.2.0.tar.gz or greater.  The
+latest stable release is 2.2.0f and is available at
+ftp://sunsite.unc.edu/pub/Linux/system/Network/serial/ppp/ppp-2.2.0f.tar.gz.
+
+Named pipes
+===========
+
+   Linux's handling of named pipes changed (it now does it The Right Way
+instead of the SunOS way ;-).  This broke some programs that depended
+on the SunOS behavior, most notably SysVinit.  If you're running 2.59
+or earlier, you will probably get a weird error on shutdown in which
+your computer shuts down fine but "INIT: error reading initrequest" or
+words to that effect scroll across your screen hundreds of times.  To
+fix, upgrade to
+ftp://ftp.cistron.nl/pub/people/miquels/debian/sysvinit-2.60.tar.gz.
+
+   If you're trying to run NCSA httpd, you have to set pre-spawning of
+daemons to zero, as it incorrectly assumes SunOS behavior.  Some people
+have said that the Apache httpd has problems with the new named pipes,
+but I've never noticed any.
+
+   The new named pipe behavior also causes problems with Hylafax.  If
+you're running the hylafax daemon, it will just keep eating up CPU time
+until you have no idle time free.  To fix this, edit port.h included
+with the Hylafax distribution and change the line
+
+   CONFIG_OPENFIFO="O_RDONLY"
+
+   to
+
+   CONFIG_OPENFIFO="O_RDWR"
+
+   A similar method (finding all named pipes opened read-only and
+changing them to read-write) will fix any program that broke because of
+this change.
+
+Uugetty
+=======
+
+   Older uugettys will not allow use of a bidirectional serial line.  To
+fix this problem, upgrade to
+ftp://sunsite.unc.edu/pub/Linux/system/Serial/getty_ps-2.0.7h.tar.gz.
+
+Console
+=======
+
+   The Linux console type has changed.  If your setup is old enough that
+you have problems, you'll need to update your termcap.  To fix, add
+linux to one of the types in /etc/termcap or snoop around
+http://www.ccil.org/~esr/ncurses.html (reputedly the latest universal
+termcap maintainer).  You may also need to update terminfo by running
+the following as root:
+
+   ln -s /usr/lib/terminfo/l/linux /usr/lib/terminfo/c/console
+
+   Better yet, just get the latest official Linux termcap from
+ftp://sunsite.unc.edu/pub/Linux/GCC/termcap-2.0.8.tar.gz
+
+Hdparm
+======
+
+   Hdparm has been upgraded to take advantage of the latest features of
+the kernel drivers.  The latest non-beta version can be found at
+ftp://sunsite.unc.edu/pub/Linux/kernel/patches/diskdrives/hdparm-2.7.tar.gz.
+
+IP Accounting
+=============
+
+   IP accounting has now been integrated into the kernel.  To use this,
+you'll need to get ipfwadm from ftp://ftp.xos.nl/pub/linux/ipfwadm.  Get
+ipfwadm-2.0beta2.tar.gz if your kernel is 1.3.66 or later.
+
+Networking
+==========
+
+   Some of the /proc/net entries have changed.  You'll need to upgrade
+to the latest net-tools in
+ftp://ftp.inka.de:/pub/comp/Linux/networking/net-tools.  The last
+official release there is net-tools-1.2.0.tar.gz, and the latest
+release is net-tools-1.3.6-BETA5.tar.gz.  If you need the upgrade, you
+probably need the latest beta release.
+
+xntpd
+=====
+
+   Older versions of xntpd will not work with the latest kernels.
+Upgrade to xntp3.5f.tar.Z, available from
+ftp://louie.udel.edu/pub/ntp/xntp3.5f.tar.Z.
+
+Sound driver
+============
+
+   The sound driver was upgraded in the 1.3.x kernels, breaking vplay.
+To fix this problem, get a new version of the sndkit from
+ftp://ftp.best.com/pub/front/tasd/snd-util-3.5.tar.gz
+
+tcsh
+====
+
+   If tcsh acts funny, get the source from
+ftp://tesla.ee.cornell.edu/pub/tcsh and add #define SYSMALLOC in
+config_f.h before recompiling tcsh.  Binaries can be found in
+ftp://sunsite.unc.edu/pub/Linux/system/Shells/ and a corrected one will
+probably wind up there eventually.
+
+Make
+====
+
+   If make no longer works, you need to read the release notes for the
+libc you upgraded to.  The latest libc and release notes can be found at
+ftp://tsx-11.mit.edu/pub/linux/packages/GCC.  This is NOT an error due
+to the kernel, though many people have mistakenly thought it is.  When
+you upgrade to libc-5.3.9, you have to patch make to get it to work.
+All of this is documented in the release notes with libc.  Upgrading
+libc can also break xterm support.  If it does, you need to recompile
+xterm.
+
+Loop device
+===========
+
+   1.3.x kernels include loop device support which lets you mount a
+file as a file system, which can allow for all sorts of cool things
+like encrypted file systems and such.  To use it, you'll need a
+modified version of mount from
+ftp://ftp.win.tue.nl:/pub/linux/util/mount-2.5X.tar.gz and preliminary
+work on encrypted file system support can be found in
+ftp.funet.fi:/pub/OS/Linux/BETA/loop/des.1.tar.gz.
+
+Multiple device
+===============
+
+   Multiple device support (allowing you to group several partitions
+into one logical device) has also been added.  Check out
+ftp://sweet-smoke.ufr-info-p7.ibp.fr/pub/Linux/md034.tar.gz to try this
+out.
+
+Arp
+===
+
+   Arp daemon support has been added.  Check out
+http://www.loran.com/~layes/arpd/index.html for more info and a copy of
+arpd.
+
+Quota
+=====
+
+   Quota support has also been added.  You need to get quotas-1.51 from
+ftp://ftp.funet.fi/pub/Linux/PEOPLE/Linus/subsystems/quota/all.tar.gz.
+This will compile just fine after you copy its mntent.h over to
+/usr/include/mntent.h.  I've uploaded this to sunsite as
+ftp://sunsite.unc.edu/pub/Linux/system/Admin/quotas-1.51-tar.gz
+
+APM support
+===========
+
+   Advanced Power Management (APM) support has been added to the kernel
+as well.  APM, which is primarily of use in laptops, provides access to
+battery status information and may help to conserve battery power.  The
+support files can be found in
+ftp://tsx-11.mit.edu/pub/linux/packages/laptops/apm/apmd-2.2.tar.gz
+
+iBCS and Dosemu
+===============
+
+   For a version of iBCS that works with 1.3.x kernels, grab
+ftp://tsx-11.mit.edu/pub/linux/BETA/ibcs2/ibcs-1.3-960404-ALPHA.tar.gz
+
+   For a version of Dosemu that works (well, at least as well as DOS
+ever works ;-), get
+ftp://tsx-11.mit.edu/pub/linux/ALPHA/dosemu/Development/dosemu-0.63.1.8.tgz.
+
+Please send info about any other packages that 1.3.x "broke" or about
+any new features of 1.3.x that require extra packages for use to Chris
+Ricker (gt1355b@prism.gatech.edu).
+
+How to know the version of the installed programs
+*************************************************
+
+   There are some simple methods useful to know the version of the
+installed programs and libraries.
+
+GNU CC: gcc -v and gcc --version
+PPP: pppd -h (wrong but it show the version)
+Libc: ls -l /lib/libc.so.5
+LibC++: ls -l /usr/lib/libg++.so
+Binutils: ld -v
+dld: ldd -v and ldd -V
+termcap: ls -l /lib/libtermcap.so.*
+modules: insmod -V
+procps: ps --version
+
+Where to get the files
+**********************
+
+Binutils
+========
+
+ftp://sunsite.unc.edu/pub/Linux/GCC/binutils-2.6.0.12.bin.tar.gz
+Installation notes:
+ftp://sunsite.unc.edu/pub/Linux/GCC/release.binutils-2.6.0.12
+
+GNU CC
+======
+
+ftp://sunsite.unc.edu/pub/Linux/GCC/gcc-2.7.2.bin.tar.gz
+Installation notes:
+ftp://sunsite.unc.edu/pub/Linux/GCC/release.gcc-2.7.2
+
+Linux C Library
+===============
+
+The stable 5.2.18 release:
+ftp://sunsite.unc.edu/pub/Linux/GCC/libc-5.2.18.bin.tar.gz
+Installation notes for 5.2.18:
+ftp://sunsite.unc.edu/pub/Linux/GCC/release.libc-5.2.18
+
+The latest 5.3.12 release:
+ftp://sunsite.unc.edu/pub/Linux/GCC/libc-5.3.12.bin.tar.gz
+Installation notes for 5.2.18:
+ftp://sunsite.unc.edu/pub/Linux/GCC/release.libc-5.3.12
+
+Patched make sources:
+ftp://sunsite.unc.edu/pub/Linux/devel/make/make-3.74.patched.tar.gz
+Patched make binary:
+ftp://sunsite.unc.edu/pub/Linux/devel/make/make-3.74-direntfix-elf.tgz
+
+Linux C++ Library
+=================
+
+ftp://sunsite.unc.edu/pub/Linux/GCC/libg++-2.7.1.4.bin.tar.gz
+Installation notes:
+ftp://sunsite.unc.edu/pub/Linux/GCC/release.libg++-2.7.1.4
+
+Dynamic Linker
+==============
+
+ftp://sunsite.unc.edu/pub/Linux/GCC/ld.so-1.7.14.tar.gz
+
+Termcap Library
+===============
+
+ftp://sunsite.unc.edu/pub/Linux/GCC/termcap-2.0.8.tar.gz
+
+Modules utilities
+=================
+
+The latest public release:
+ftp://sunsite.unc.edu/pub/Linux/kernel/modules-1.3.57.tar.gz
+The latest experimental release:
+http://www.pi.se/blox/
+
+PPP Daemon and utilities
+========================
+
+The latest public release:
+ftp://sunsite.unc.edu/pub/Linux/system/Network/serial/ppp/ppp-2.2.0f.tar.gz
+
+Procps utilities
+================
+
+ftp://sunsite.unc.edu/pub/Linux/system/Status/ps/procps-0.99a.tgz
+
+Gpm mouse utilities
+===================
+
+ftp://iride.unipv.it/pub/gpm/gpm-1.06.tar.gz
+ftp://sunsite.unc.edu/pub/Linux/system/Daemons/gpm-1.06.tar.gz
+
+SysVinit utilities
+==================
+
+At the time of writing:
+ftp://sunsite.unc.edu/pub/Linux/system/Daemons/init/sysvinit-2.60.tar.gz
+
+Util-linux
+==========
+
+ftp://sunsite.unc.edu/pub/Linux/system/Misc/util-linux-2.5.tar.gz
+
